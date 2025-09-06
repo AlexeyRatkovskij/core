@@ -31,7 +31,7 @@ namespace ReactUnity.Types
         public float Grain { get; } = 0;
         public float Pixelate { get; } = 0;
         public float Sepia { get; } = 0;
-        // public BoxShadow DropShadow;
+        public float Radius { get; set; } = 0;
 
         public FilterDefinition(
             float blur = 0,
@@ -44,8 +44,8 @@ namespace ReactUnity.Types
             float saturate = 1,
             float grain = 0,
             float pixelate = 0,
-            float sepia = 0
-
+            float sepia = 0,
+            float radius = 0
         )
         {
             Blur = blur;
@@ -59,6 +59,7 @@ namespace ReactUnity.Types
             Grain = grain;
             Pixelate = pixelate;
             Sepia = sepia;
+            Radius = radius;
         }
 
         public object Interpolate(object to, float t)
@@ -77,7 +78,8 @@ namespace ReactUnity.Types
                 saturate: Interpolater.Interpolate(Saturate, tto.Saturate, t),
                 grain: Interpolater.Interpolate(Grain, tto.Grain, t),
                 pixelate: Interpolater.Interpolate(Pixelate, tto.Pixelate, t),
-                sepia: Interpolater.Interpolate(Sepia, tto.Sepia, t)
+                sepia: Interpolater.Interpolate(Sepia, tto.Sepia, t),
+                radius: Interpolater.Interpolate(Radius, tto.Radius, t)
             );
         }
 
@@ -94,6 +96,7 @@ namespace ReactUnity.Types
             static IComputedValue grainDefault = new ComputedConstant(0);
             static IComputedValue pixelateDefault = new ComputedConstant(0);
             static IComputedValue sepiaDefault = new ComputedConstant(0);
+            static IComputedValue radiusDefault = new ComputedConstant(0);
 
             protected override System.Type TargetType => typeof(FilterDefinition);
 
@@ -111,6 +114,7 @@ namespace ReactUnity.Types
                 IComputedValue grain = grainDefault;
                 IComputedValue pixelate = pixelateDefault;
                 IComputedValue sepia = sepiaDefault;
+                IComputedValue radius = radiusDefault;
 
                 var calls = ParserHelpers.SplitWhitespace(value?.ToString());
                 var count = calls.Count;
@@ -139,6 +143,7 @@ namespace ReactUnity.Types
                     else if (name == "grain") { if (!AllConverters.PercentageConverter.TryConvert(ac, out grain)) return false; }
                     else if (name == "pixelate") { if (!AllConverters.LengthConverter.TryConvert(ac, out pixelate)) return false; }
                     else if (name == "sepia") { if (!AllConverters.PercentageConverter.TryConvert(ac, out sepia)) return false; }
+                    else if (name == "radius") { if (!AllConverters.LengthConverter.TryConvert(ac, out radius)) return false; }
                 }
 
                 result = new ComputedCompound(new List<IComputedValue> {
@@ -153,6 +158,7 @@ namespace ReactUnity.Types
                     grain,
                     pixelate,
                     sepia,
+                    radius,
                 }, new List<StyleConverterBase> {
                     AllConverters.LengthConverter,
                     AllConverters.PercentageConverter,
@@ -164,7 +170,8 @@ namespace ReactUnity.Types
                     AllConverters.PercentageConverter,
                     AllConverters.PercentageConverter,
                     AllConverters.LengthConverter,
-                    AllConverters.PercentageConverter,
+                    AllConverters.LengthConverter,
+                    AllConverters.LengthConverter,
                 }, values => new FilterDefinition(
                     blur: System.Convert.ToSingle(values[0]),
                     brightness: System.Convert.ToSingle(values[1]),
@@ -176,7 +183,8 @@ namespace ReactUnity.Types
                     saturate: System.Convert.ToSingle(values[7]),
                     grain: System.Convert.ToSingle(values[8]),
                     pixelate: System.Convert.ToSingle(values[9]),
-                    sepia: System.Convert.ToSingle(values[10])
+                    sepia: System.Convert.ToSingle(values[10]),
+                    radius: System.Convert.ToSingle(values[11])
                 ));
                 return true;
             }
@@ -187,22 +195,23 @@ namespace ReactUnity.Types
         public override bool Equals(object obj)
         {
             return obj is FilterDefinition definition &&
-                   Blur == definition.Blur &&
-                   Brightness == definition.Brightness &&
-                   Contrast == definition.Contrast &&
-                   Grayscale == definition.Grayscale &&
-                   HueRotate == definition.HueRotate &&
-                   Invert == definition.Invert &&
-                   Opacity == definition.Opacity &&
-                   Saturate == definition.Saturate &&
-                   Grain == definition.Grain &&
-                   Pixelate == definition.Pixelate &&
-                   Sepia == definition.Sepia;
+                Blur == definition.Blur &&
+                Brightness == definition.Brightness &&
+                Contrast == definition.Contrast &&
+                Grayscale == definition.Grayscale &&
+                HueRotate == definition.HueRotate &&
+                Invert == definition.Invert &&
+                Opacity == definition.Opacity &&
+                Saturate == definition.Saturate &&
+                Grain == definition.Grain &&
+                Pixelate == definition.Pixelate &&
+                Sepia == definition.Sepia &&
+                Radius == definition.Radius;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Blur + Pixelate, Brightness, Contrast, Grayscale, HueRotate, Invert + Grain, Opacity, Saturate + Sepia);
+            return HashCode.Combine(Blur + Pixelate, Brightness, Contrast, Grayscale, HueRotate, Invert + Grain, Opacity + Radius, Saturate + Sepia);
         }
 
         #endregion

@@ -62,6 +62,7 @@ namespace ReactUnity.UGUI.Shapes
                     mat.SetFloat("_Grain", Definition.Grain);
                     mat.SetFloat("_Pixelate", Definition.Pixelate);
                     mat.SetFloat("_Sepia", Definition.Sepia);
+                    mat.SetFloat("_BorderRadius", Definition.Radius);
                 }
             }
         }
